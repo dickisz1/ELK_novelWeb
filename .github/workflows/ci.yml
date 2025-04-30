@@ -15,37 +15,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # Step 1: 检出代码到工作环境
-    - name: Check out code
-      uses: actions/checkout@v3
+      # Step 1: 检出代码到工作环境
+      - name: Check out code
+        uses: actions/checkout@v3
 
-    # Step 2: 设置 Java 环境
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17' # 根据项目需求设置 Java 版本
-        distribution: 'temurin'
+      # Step 2: 设置 Java 环境
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17' # 根据项目需求设置 Java 版本
+          distribution: 'temurin'
 
-    # Step 3: 缓存 Maven 依赖
-    - name: Cache Maven dependencies
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-        restore-keys: |
-          ${{ runner.os }}-maven-
+      # Step 3: 调试 Maven 配置
+      - name: Debug Maven Settings
+        run: |
+          mkdir -p ~/.m2
+          if [ -f ~/.m2/settings.xml ]; then
+            echo "Maven settings.xml exists:"
+            cat ~/.m2/settings.xml
+          else
+            echo "No settings.xml found. Creating one..."
+            echo "<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'
+                    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                    xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>
+                  </settings>" > ~/.m2/settings.xml
+            echo "Created settings.xml:"
+            cat ~/.m2/settings.xml
 
-    # Step 4: 编译项目
-    - name: Build with Maven
-      run: mvn clean install
+      # Step 4: 缓存 Maven 依赖
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-    # Step 5: 运行测试
-    - name: Run tests
-      run: mvn test
+      # Step 5: 编译项目
+      - name: Build with Maven
+        run: mvn clean install
 
-    # Step 6: 打包项目
-    - name: Package project
-      run: mvn package
+      # Step 6: 运行测试
+      - name: Run tests
+        run: mvn test
+
+      # Step 7: 打包项目
+      - name: Package project
+        run: mvn package
 
   deploy:
     # 部署任务（可选）
@@ -53,5 +69,5 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Deploy (placeholder)
-      run: echo "Add deployment steps here"
+      - name: Deploy (placeholder)
+        run: echo "Add deployment steps here"
