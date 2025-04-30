@@ -36,11 +36,12 @@ jobs:
           else
             echo "No settings.xml found. Creating one..."
             echo "<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'
-                    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-                    xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>
-                  </settings>" > ~/.m2/settings.xml
+                  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+                  xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>
+                </settings>" > ~/.m2/settings.xml
             echo "Created settings.xml:"
             cat ~/.m2/settings.xml
+          fi  # 添加此行以关闭 if 语句
 
       # Step 4: 缓存 Maven 依赖
       - name: Cache Maven dependencies
