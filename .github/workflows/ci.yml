@@ -1,0 +1,57 @@
+name: Java CI/CD for ELK_novelWeb
+
+on:
+  # 触发条件：代码推送到主分支或创建 Pull Request
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    # 在 Ubuntu 最新版本的虚拟机上运行
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: 检出代码到工作环境
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    # Step 2: 设置 Java 环境
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17' # 根据项目需求设置 Java 版本
+        distribution: 'temurin'
+
+    # Step 3: 缓存 Maven 依赖
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    # Step 4: 编译项目
+    - name: Build with Maven
+      run: mvn clean install
+
+    # Step 5: 运行测试
+    - name: Run tests
+      run: mvn test
+
+    # Step 6: 打包项目
+    - name: Package project
+      run: mvn package
+
+  deploy:
+    # 部署任务（可选）
+    # 如果需要自动部署，例如部署到服务器或云服务，可以在此添加部署步骤
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deploy (placeholder)
+      run: echo "Add deployment steps here"
